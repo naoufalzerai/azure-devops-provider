@@ -1,6 +1,6 @@
 <?php
 
-namespace SocialiteProviders\Azure;
+namespace SocialiteProviders\devops;
 
 use SocialiteProviders\Manager\OAuth2\User as oAuth2User;
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace SocialiteProviders\Azure;
+namespace SocialiteProviders\Devops;
 
 use SocialiteProviders\Manager\SocialiteWasCalled;
 
-class AzureExtendSocialite
+class DevopsExtendSocialite
 {
     public function handle(SocialiteWasCalled $socialiteWasCalled): void
     {
-        $socialiteWasCalled->extendSocialite('azure', Provider::class);
+        $socialiteWasCalled->extendSocialite('devops', Provider::class);
     }
 }
