@@ -1,0 +1,34 @@
+{
+    "name": "socialiteproviders/azure-devops",
+    "description": "Microsoft Azure devops Provider for Laravel Socialite",
+    "license": "MIT",
+    "keywords": [
+        "azure",
+        "laravel",
+        "microsoft",
+        "oauth",
+        "provider",
+        "socialite"
+    ],
+    "authors": [
+        {
+            "name": "Naoufal Zerai",
+            "email": "naoufal@zerai.net"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/naoufalzerai/AzureDevOpsClient/issues",
+        "source": "https://github.com/naoufalzerai/AzureDevOpsClient",
+        "docs": "https://github.com/naoufalzerai/AzureDevOpsClient"
+    },
+    "require": {
+        "php": "^8.0",
+        "ext-json": "*",
+        "socialiteproviders/manager": "^4.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "SocialiteProviders\\Azure\\": ""
+        }
+    }
+}
