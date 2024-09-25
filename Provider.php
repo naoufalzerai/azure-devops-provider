@@ -113,11 +113,16 @@ class Provider extends AbstractProvider
     public function getAccessTokenResponse($code)
     {
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
-            RequestOptions::HEADERS     => ['Accept' => 'application/json'],
-            RequestOptions::FORM_PARAMS => $this->getTokenFields($code),
-            RequestOptions::PROXY       => $this->getConfig('proxy'),
+            RequestOptions::HEADERS     => ['Content-Type' => 'application/x-www-form-urlencoded'],
+            RequestOptions::FORM_PARAMS => [
+                "client_assertion_type"=>"urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                "client_assertion"=>$this->getConfig('secret'),
+                "grant_type"=>"urn:ietf:params:oauth:grant-type:jwt-bearer",
+                "assertion"=>$code,
+                "redirect_uri"=>$this->getConfig('redirect'),
+            ],
         ]);
-
+        exit(dd($response));
         return json_decode((string) $response->getBody(), true);
     }
 
@@ -134,6 +139,6 @@ class Provider extends AbstractProvider
      */
     public static function additionalConfigKeys()
     {
-        return ['tenant', 'proxy'];
+        return [ 'secret'];
     }
 }
