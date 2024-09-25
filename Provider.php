@@ -122,7 +122,7 @@ class Provider extends AbstractProvider
                 "redirect_uri"=>$this->getConfig('redirect'),
             ],
         ]);
-        exit(dd($response));
+        exit(dd(json_decode((string) $response->getBody(), true)));
         return json_decode((string) $response->getBody(), true);
     }
 
