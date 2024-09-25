@@ -7,7 +7,7 @@ use SocialiteProviders\Manager\OAuth2\AbstractProvider;
 
 class Provider extends AbstractProvider
 {
-    public const IDENTIFIER = 'AZURE';
+    public const IDENTIFIER = 'DEVOPS';
 
     /**
      * The base Azure Graph URL.
