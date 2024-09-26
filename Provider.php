@@ -9,12 +9,6 @@ class Provider extends AbstractProvider
 {
     public const IDENTIFIER = 'DEVOPS';
 
-    /**
-     * The base Azure Graph URL.
-     *
-     * @var string
-     */
-    protected $graphUrl = 'https://graph.microsoft.com/v1.0/me';
 
     /**
      * {@inheritdoc}
@@ -33,7 +27,8 @@ class Provider extends AbstractProvider
      */
     protected function getAuthUrl($state)
     {
-        return $this->buildAuthUrlFromBase($this->getBaseUrl().'/oauth2/authorize', $state);
+        $register_url = "https://app.vssps.visualstudio.com/oauth2/authorize?client_id=".$this->getConfig('client_id')."&response_type=Assertion&state=User1&scope=vso.build_execute%20vso.code_write%20vso.graph%20vso.identity%20vso.pipelineresources_use%20vso.threads_full%20vso.work_write&redirect_uri=".$this->getConfig('redirect');
+        return $register_url;
     }
 
     /**
@@ -77,14 +72,14 @@ class Provider extends AbstractProvider
      */
     protected function getUserByToken($token)
     {
-        $response = $this->getHttpClient()->get($this->graphUrl, [
+        $url = "https://dev.azure.com/".$this->getConfig('organisation')."/_apis/ConnectionData";
+        $response = $this->getHttpClient()->get($url, [
             RequestOptions::HEADERS => [
-                'Accept'        => 'application/json',
+                'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer '.$token,
             ],
-            RequestOptions::PROXY => $this->getConfig('proxy'),
         ]);
-
+        $f = json_decode((string) $response->getBody(), true);
         return json_decode((string) $response->getBody(), true);
     }
 
@@ -93,6 +88,7 @@ class Provider extends AbstractProvider
      */
     protected function mapUserToObject(array $user)
     {
+        exit(dd($user));
         return (new User())->setRaw($user)->map([
             'id'            => $user['id'],
             'nickname'      => null,
@@ -112,6 +108,7 @@ class Provider extends AbstractProvider
      */
     public function getAccessTokenResponse($code)
     {
+
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             RequestOptions::HEADERS     => ['Content-Type' => 'application/x-www-form-urlencoded'],
             RequestOptions::FORM_PARAMS => [
@@ -122,7 +119,6 @@ class Provider extends AbstractProvider
                 "redirect_uri"=>$this->getConfig('redirect'),
             ],
         ]);
-        exit(dd(json_decode((string) $response->getBody(), true)));
         return json_decode((string) $response->getBody(), true);
     }
 
@@ -139,6 +135,6 @@ class Provider extends AbstractProvider
      */
     public static function additionalConfigKeys()
     {
-        return [ 'secret'];
+        return [ 'secret','organisation'];
     }
 }
