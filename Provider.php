@@ -9,25 +9,21 @@ class Provider extends AbstractProvider
 {
     public const IDENTIFIER = 'DEVOPS';
 
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $scopeSeparator = ' ';
-
     /**
      * The scopes being requested.
      *
      * @var array
      */
-    protected $scopes = ['vso.build_execute', 'vso.code_write', 'vso.identity', 'vso.pipelineresources_use', 'vso.threads_full', 'vso.work_write'];
+    protected $scopes = [];
 
     /**
      * {@inheritdoc}
      */
+
     protected function getAuthUrl($state)
     {
-        $register_url = "https://app.vssps.visualstudio.com/oauth2/authorize?client_id=".$this->getConfig('client_id')."&response_type=Assertion&state=User1&scope=vso.build_execute%20vso.code_write%20vso.graph%20vso.identity%20vso.pipelineresources_use%20vso.threads_full%20vso.work_write&redirect_uri=".$this->getConfig('redirect');
+        $scopes = implode("%20",$this->getConfig("scope"));
+        $register_url = "https://app.vssps.visualstudio.com/oauth2/authorize?client_id=".$this->getConfig('client_id')."&response_type=Assertion&state=User1&scope=$scopes&redirect_uri=".$this->getConfig('redirect');
         return $register_url;
     }
 
@@ -74,7 +70,10 @@ class Provider extends AbstractProvider
     {
         $url = "https://dev.azure.com/".$this->getConfig('organisation')."/_apis/ConnectionData";
         $response = $this->getHttpClient()->get($url, [
+        $url = "https://dev.azure.com/".$this->getConfig('organisation')."/_apis/ConnectionData";
+        $response = $this->getHttpClient()->get($url, [
             RequestOptions::HEADERS => [
+                'Content-Type' => 'application/json',
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer '.$token,
             ],
@@ -88,14 +87,14 @@ class Provider extends AbstractProvider
      */
     protected function mapUserToObject(array $user)
     {
-        exit(dd($user));
+        $_user = $user["authenticatedUser"];
         return (new User())->setRaw($user)->map([
-            'id'            => $user['id'],
+            'id'            => $_user['id'],
             'nickname'      => null,
-            'name'          => $user['displayName'],
-            'email'         => $user['userPrincipalName'],
-            'principalName' => $user['userPrincipalName'],
-            'mail'          => $user['mail'],
+            'name'          => $_user['providerDisplayName'],
+            'email'         => $_user['properties']['Account']['$value'],
+            'principalName' => null,
+            'mail'          => null,
             'avatar'        => null,
         ]);
     }
@@ -109,7 +108,16 @@ class Provider extends AbstractProvider
     public function getAccessTokenResponse($code)
     {
 
+
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
+            RequestOptions::HEADERS     => ['Content-Type' => 'application/x-www-form-urlencoded'],
+            RequestOptions::FORM_PARAMS => [
+                "client_assertion_type"=>"urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                "client_assertion"=>$this->getConfig('secret'),
+                "grant_type"=>"urn:ietf:params:oauth:grant-type:jwt-bearer",
+                "assertion"=>$code,
+                "redirect_uri"=>$this->getConfig('redirect'),
+            ],
             RequestOptions::HEADERS     => ['Content-Type' => 'application/x-www-form-urlencoded'],
             RequestOptions::FORM_PARAMS => [
                 "client_assertion_type"=>"urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
@@ -135,6 +143,6 @@ class Provider extends AbstractProvider
      */
     public static function additionalConfigKeys()
     {
-        return [ 'secret','organisation'];
+        return [ 'secret','organisation','scope'];
     }
 }
