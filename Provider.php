@@ -70,8 +70,6 @@ class Provider extends AbstractProvider
     {
         $url = "https://dev.azure.com/".$this->getConfig('organisation')."/_apis/ConnectionData";
         $response = $this->getHttpClient()->get($url, [
-        $url = "https://dev.azure.com/".$this->getConfig('organisation')."/_apis/ConnectionData";
-        $response = $this->getHttpClient()->get($url, [
             RequestOptions::HEADERS => [
                 'Content-Type' => 'application/json',
                 'Content-Type' => 'application/json',
